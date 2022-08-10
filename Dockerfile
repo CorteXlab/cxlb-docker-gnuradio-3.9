@@ -1,10 +1,6 @@
-FROM debian:buster
+FROM debian:bullseye
 
 ENV APT="apt-get -y"
-
-# pinning
-RUN echo "deb http://ftp.debian.org/debian/ bullseye main non-free contrib" >> /etc/apt/sources.list
-RUN echo "Package: *\nPin: release a=buster\nPin-Priority: 700\n\nPackage: *\nPin: release a=bullseye\nPin-Priority: -1" > /etc/apt/preferences.d/pinning
 
 RUN ${APT} update && ${APT} dist-upgrade
 
@@ -36,16 +32,16 @@ ENV PARMS="cxlb_toolchain_build /cortexlab/toolchains/current"
 RUN ${APT} install udev
 RUN ${BUILD} uhd=master ${PARMS}
 RUN ${BUILD} uhd-firmware ${PARMS}
-RUN ${APT} install python3-pybind11/bullseye python3-pygccxml/bullseye
+#RUN ${APT} install python3-pybind11/bullseye python3-pygccxml/bullseye python3-jsonschema/bullseye
 RUN ${BUILD} volk=main ${PARMS}
 RUN ${BUILD} gnuradio=maint-3.9 ${PARMS}
-#RUN ${BUILD} gr-bokehgui=maint-3.8 ${PARMS} # gr-bokehgui doesn't work with gnuradio-3.9
+RUN ${BUILD} gr-bokehgui=master ${PARMS}
 RUN ${BUILD} gr-iqbal=master ${PARMS}
 # RUN ${BUILD} fft-web ${PARMS}
 
 # activate toolchain configuration
 RUN /cortexlab/toolchains/current/bin/cxlb-toolchain-system-conf
-RUN echo source /cortexlab/toolchains/current/bin/cxlb-toolchain-user-conf >> /etc/profile
+#RUN echo source /cortexlab/toolchains/current/bin/cxlb-toolchain-user-conf >> /etc/profile
 RUN ln -s /cortexlab/toolchains/current/bin/cxlb-toolchain-user-conf /etc/profile.d/cxlb-toolchain-user-conf.sh
 # RUN sysctl -w net.core.wmem_max=2500000
 
