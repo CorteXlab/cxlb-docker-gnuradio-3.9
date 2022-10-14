@@ -2,6 +2,10 @@ FROM debian:bullseye
 
 ENV APT="apt-get -y"
 
+# pinning
+RUN echo "deb http://ftp.debian.org/debian/ bookworm main non-free contrib" >> /etc/apt/sources.list
+RUN echo "Package: *\nPin: release a=bullseye\nPin-Priority: 700\n\nPackage: *\nPin: release a=stable\nPin-Priority: 700\n\nPackage: *\nPin: release a=bookworm\nPin-Priority: -1\n\nPackage: *\nPin: release a=testing\nPin-Priority: -1" > /etc/apt/preferences.d/pinning
+
 RUN ${APT} update && ${APT} dist-upgrade
 
 WORKDIR /root
@@ -35,6 +39,7 @@ RUN ${BUILD} uhd-firmware ${PARMS}
 #RUN ${APT} install python3-pybind11/bullseye python3-pygccxml/bullseye python3-jsonschema/bullseye
 RUN ${BUILD} volk=main ${PARMS}
 RUN ${BUILD} gnuradio=maint-3.9 ${PARMS}
+RUN ${APT} -t bookworm install nodejs
 RUN ${BUILD} gr-bokehgui=master ${PARMS}
 RUN ${BUILD} gr-iqbal=master ${PARMS}
 # RUN ${BUILD} fft-web ${PARMS}
